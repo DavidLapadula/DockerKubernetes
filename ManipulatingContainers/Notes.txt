@@ -1,0 +1,32 @@
+- Run own applications, with own container
+- Docker file: text file for config, defines how container behaves, and what happens when it starts
+	- File to Docker Client > Docker Server builds image from config > Makes usable image
+		- Specify image > run commands for addtl programs > startup command 
+- Need Dockerfile
+	- Instruction (for docker server to do to image) <argument> for instruction
+	- FROM (specify which image) RUN (execute command while image being prepped) CMD (command to execute when imge starts)
+	- Analogy: dockerfile is like computer without OS and told to install chrome
+		- Base image is like installing bare OS/ starting point, commands like installing application, then the final command is run program
+			- alpine example, because it has required base default set of programs
+- Build process
+	- docker build .: take docker file, pass to docker server to build image
+		- argument following build is context or set of files figured to docker in folder
+	- RUN: Make new container in memory from base image sourced in FROM, and make temp container for it, and then executes command you gave as primary running process
+		- Ex. download and install some applications, and put in new container
+		- Take file snapshot, remove container, save snapshot as image (with everything from step 2, including installed programs)
+	- CMD: look at image from prevous step, make temp container from it, and then argument we provided becomes its startup command
+		- After primary command set, it takes a snapshot of FS to make final image
+	- Every image from previous step, either make image, make new container, execute command or change FS, and then snapshot FS of that container for NEXT instruction in chain
+	- Each instruction gives us a new image (of FS snapshot) and startup command
+- Rebuilds
+	- Will not fetch image from Docker Hub second time because already in image cache
+	- Will NOT reinstall if getting same image from previous step (like if dependency already added) because already have it
+		- If already made image from container, cached on machine so will not make again
+		- Only need to re-run after series of steps have changed
+- Tag an image
+	- add -t flag before build directory for name to customize that can be referenced later
+		- dockerid/reponame:latest allows for docker run dockerid/reponame
+- Can manually create container and then generate image from it
+	- Run base image container, change it, take image with base command, and then run that image to make container
+	- docker commit -c 'CMD ["command"]' <container id>
+

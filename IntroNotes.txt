@@ -1,0 +1,66 @@
+- Issues when installing software. Make it easy to install and run software on PC
+- Is a platform ecosystem
+- CLI -> Hub: Gets an Image (single file with config to run program)
+	- Container is instance of an image to run a program. Isolated set of resources (memory, networking, disc space)
+- Docker for Windows
+	- Docker Client (CLI): issue commands to it, portal for interacting with server
+	- Docker Server: create image, run containers, etc.
+- 'run' means get an image
+-  Command > Docker CLI > Docker Server
+	- Local image in image cache? No: Look at Docker Hub (free public images that can run) and get image 
+		- Store new image in local image cache
+		- Make a new local container (meant to run one program) for image, load into memory, and run it
+- What is a container: Running process with subset of resources on computer allocated for it specifically
+	- OS: Kernel as governing process between programs running on computer and the hardware (intermediate layer)
+		- Kernel exposes endpoints for system calls to do something
+		- Process (Chrome) > System call to kernel > do something with hardware
+		- Namespacing: segment of hardware dedicated to housing program, and give access to process that require namespace
+			- Isolate resource per process
+			- So if chrome need c++, kernel will redirect call to namespace/segment where c++ is
+		- Control group (cgroup): limit amount of resources a process can use (memory, CPU usage, I/O, Network bandwidth)
+	- A container is a set of processes with resources assigned to it
+		- Program (Node) > System Call > Kernel (which process making call) and then direct call > Hardware resource (portions of memory, CPU etc made available to process)
+	- Image: file system snapshot, and startup command
+		- Image to container: kernel isolates section of HD for just that container, and places file snapshot in that segment
+		- Run command to start process with isolated resources
+- Namespacing and cgroups are specific to linux
+	- Linux VM running with kernel that hosts processes and runs the container
+	- VM responsbile for allocation of hardware resources on PC
+- Create container is just file system snapshot, Start is getting the processes going
+- Docker Client
+	- docker(ref docker client) run(try create and run container) <image name> (name of image) <alt command>
+		- Get fs snapshot and command by defailt
+		- Alt command to override default
+		- Can only run alt commands when container has those programs running
+	- docker ps: list running containers
+		- --all for every container ever created
+		- Only for containers currently running
+	- Creating container and running are different
+		- docker create + docker start same
+	- create <container name>
+	- start -a <id>
+		- -a flags looks for output from container and outputs to log
+		- Will re-issue running command which cannot change	 
+	- system prune: removed stopped and any images from docker hub
+	- logs <id>: get record of all info from that container, does not restart the container
+	- stop/kill <id> to get exit the container
+		- stop send sigterm signal (hardware signal), signal for about to shutdown and allows to turn off gracefully and do cleanup
+		- kill send sigkill signal, so shutdown right now without cleanup
+	- exec -it <sh>: issue additional command in container, as it allows us to provide input to the container
+		- sh is command processor, executes commands
+		- open shell in the container with sh option
+			- Can then issue commands inside container, if container is running redis-server can access cli redis-cli
+	- docker run -it busybox sh: get directly into a shell for a container
+- Multi-command
+	- Running program in container, need to get into container to issue commands. External commands from PC will not work
+	- docker exec -it <container id> <command>
+		- Go into running container and issue a command
+- -it flag: short for -i -t
+	- -i means attach to standard in channel, -t will format the text
+	- Every command issued in linux enviro has STDIN (standard in), STDOUT (standard out), STDERR (standard error) channels used to communicate info into/out of the process
+	- Things you type in terminal issue to STDIN channel (which could be attached to redis CLI in running container)
+	- STDOUT channel conveys information out of the program
+- No sharing of data or files between two containers
+
+
+	 
