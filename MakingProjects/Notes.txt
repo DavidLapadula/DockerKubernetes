@@ -1,0 +1,26 @@
+- Specify Image > Run command to install programs > specify startup command
+- Base image chosen based on set of programs required to built set of programs
+	- Can either find proper image, or install what is required on your own with addtl commands
+	- If choosing image from hub can choose specific type using tage like node:alpine
+- 'alpine' means image as lean as possible, with as few programs as possible
+- Only files available are what came from image, even if in directory with DockerFile
+	- Since image is snapshot of FS stored on small subsection of HD, it does not have access to file elsewhere
+	- Files in project directory, not available to container by default
+- COPY <path to file on machine> ./
+	- Put things from local machine in container
+- Port Mapping
+	- No traffic coming into PC network is routed into container. Container has own set of ports
+	- Redirect traffic from computer to container, need to port map. Req forwarded to port inside container
+	- Only change during runtime
+		- docker run -p <source port> : <container port> <image id>
+- Specify working directory
+	- Bad practice to have app file in container root directory. Can accidentally override
+	- WORKDIR <relative path>, and then any commands will be in that directory 
+	- docker exec to run second process inside container
+- Rebuilds and cache busting
+	- Make change to file and rebuild, docker will see that file was change and re-do every subsequent step when making new image
+	- Specify which files to copy over, put installation AFTER this, to prevent the cache from being different unless there is a change to the files you care about
+		- Only copying bare minimum for each application
+	- Rebuild image after every change to a file when building
+	
+	
