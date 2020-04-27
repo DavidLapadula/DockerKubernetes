@@ -1,0 +1,22 @@
+- Redis: in memory data storage
+- Scaling by having multiple containers, one with Node server and one with Redis store, this allows multiple servers synchronized with one Redis store
+- Redis js dependency for connecting to redis server, using createClient()
+	- Pass host key to createClient(), and can connect to other container just by using other container name, NO URL
+		- Could also specify port
+	- redis client get(<val>, cb()), and set(<val>, cb()) to see values
+- Docker Compose
+	- Two containers do not have any default communcation, need to network the two
+	- Is a CLI tool that allows us to connect containers with networking support
+	- Connects both containers and joins them
+		- Specify name of other container, and then use this as host is redis.createClient() in app
+	- Automates commands that are used very often
+	- Need .yml file, 'services' means a container
+		- Build in docker-compose, use build for service and . for current dir
+	- Will make both containers on same network, will free access without explicit port declaration
+	- docker-compose up (to run), -d flag to run in background, --build flag will (build . and run). down to close
+- Container Maintenance
+	- 0 exit code, means exit on purpose: any other number means something went wrong. Exit code determines if container will restart
+	- Restart policy: no, always, on-failure (only with error code, status > 0), unless-stopped (alway unless forcibly)
+		- Web server would be always, on failure better for worker process
+	- Restarting uses previously made containers - attach to STDOUT logs
+	- docker-compose ps: Same as general 'ps' command but will give status of running container, but needs to be in dir of docker-compose.yml file
