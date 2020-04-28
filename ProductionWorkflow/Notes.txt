@@ -1,0 +1,38 @@
+docker run -it -p 3000:3000 -v /app/node_modules -v <path>:/app -e CHOKIDAR_USEPOLLING=true CONTAINER_ID
+
+- Develop > Test > Deploy
+- Repository as central point: feature branch is what you add code to. Push to feature, which then gets merged with master on PR
+	- Travis CI as contiuous integration that pulls code when pushed to master, runs tests, and then deploys to hosting service
+	- Does not get deployed unless tests pass
+- Docker just makes these tasks easier
+- npm run start (start development only server), npm run test (run tests with projects), npm run build (build prod version of app) that moves to one file
+- Containers for development and production
+- Use -f with docker build to specify file name
+- Image is snapshot of filesystem, so if changing src file will not reflect into container
+	- Volumes: placeholder in docker container, volume uses reference to files/folders in local machine
+		- Called volume mounting
+	- Bookmark node_modules so container file does not map to anything without local dependencies, so use node _modules in container 
+	- Map pwd to app folder (local folder system to VM)
+- Colon means map something on file system to container, no colon means is just placeholder for folder in container without mapping
+- Changes in local file system supposed to be propagated into container
+- Encode commands and volumes in compose file
+	- With build command can use . if have Dockerfile in directory
+	- Otherwise set context of build using ., AND dockerfile property with filename used during dev 
+- docker run <id> <command> to override startup command
+- -it hooks up to attach to STDIN to get data into the container
+- Attach to container so that can access and run test suite inside of it
+	- docker exec -t <id> <command>, like running test suite, to access commands inside container
+		- Allows re-attaching to existing container
+- OR setup service inside docker-compose for running test suite woth overriden commands. At same level as web service inside yml file
+	- With another service will run everytime start	container, so additional service to run test with same configuration as building container
+- Another service will create another container, like web container and test container eachwith command
+	- docker attach can forward input to container from terminal
+	- When command received npm will run another process to actually execute the tests BUT stdin attaches to primary process of computer. Cannot connect to other running process, like those used for running tests
+- Nginx
+	- In web container process, dev server has a alot of proceses for handling changes, which are not suited for development
+	- Production server SOLE purpose is to respond to requests, and respond using build files
+	- Dockerfile for making production server
+
+	
+
+	 
