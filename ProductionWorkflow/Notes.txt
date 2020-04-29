@@ -31,7 +31,17 @@ docker run -it -p 3000:3000 -v /app/node_modules -v <path>:/app -e CHOKIDAR_USEP
 - Nginx
 	- In web container process, dev server has a alot of proceses for handling changes, which are not suited for development
 	- Production server SOLE purpose is to respond to requests, and respond using build files
+	- 
 	- Dockerfile for making production server
+		- Make image the same, just start nginx server
+		- Dependencies only needed for build, and nginx image exists
+	- Multi Step process
+		- Build phase (with node as base, install dependencies, run build)
+		- Run Phase (Use nginx, [as second base image]), copy result of build, start nginx
+		- Additional FROM will enable a second phase, can use COPY --from=<name of first phase> <build directory in container> <directory on server container that servex content>
+		- 
+		
+	
 
 	
 
