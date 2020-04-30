@@ -1,0 +1,33 @@
+Travis
+ 	- Listen for changes pushed to master, githb alerts Travis
+	- Travis pulls code in repository and 'does work' - like testing and deployment
+	- Just give Travis access to repository
+	- travis.yml file to tell Travis what to do
+		- Have Docker running and ready to build image > Build image with DockerFile > Run tests > Deploy to AWS
+ 			- Travis runs commands and anything other than 0 return code is a fail
+		- before_install: setup before tests are run (use to build image, tag with name so can refer to it)
+		- script: commands needed to run test suite
+- Elastic Beanstalk
+	- Run 1 container
+	- EB creates load balancer that manages requests and routes to a VM running docker where the container is stored
+	- EB will monitor traffic and auto-scale, add VM's to route new requests to least used server
+	- Automatically makes S3 bucket
+		- One bucket used for all EB environments made
+- deploy section on .travis.yml
+	- provider: eb, b/c travis setup with eb to deploy
+	- region, based on where EB instance made
+	- app: name of app
+	- env: name of application
+		- Actual app running inside is referred to as environment
+	- bucket_name: Travis will copy and zip files and then copy to S3 bucket, or HD on AWS to deploy
+		- Need to provide name of bucket Travis deploys to 
+	- bucket_path: equal to app name
+	- on: branch: master: for deployment
+	- access_key_id, secret_access_key: secret key made from new 'User' on AWS IAM service
+		- Programmatic access will only allows keeys to be valid through network requests
+		- Attach existing policies grants permission to user that is being created (allow all)
+		- Access key ID, Secret Access key as environment secrets wit Trav CI or environment variables
+- Port mapping through deployment
+	- EXPOSE instruction in Dockerfile, EB will look for this instruction for a port to map directly
+- PR will allow travis to pull down changes, when go to merge will show that tests have passed
+- Docker is just tool in development process. Allow SETTING UP easier, and do not have to redo deployment pipeline for another project
