@@ -1,0 +1,59 @@
+- Do not want to build images multiple times, active running web server should NOT build the image after CI
+- Need application with multiple services
+- nginx can route to EITHER React server (for FE) OR Node server for backend processing
+- Redis in memory data store for caching values, stored as K,V
+	- Worker watches for changes and changes values in redis memory store
+	- Instance of redisClient with host, port, and retry strategy (how quickly to recconect to server) values
+	- Redix subscription has 'on' fn to watch, and can use named hset (hashset) and pass in calculated values
+	- subscribe("insert") to listen for changes in redis store
+	- Need one redis instance per subscription
+	- use hset() with key of store inside store followed by key and value
+	- publish(<event>, <value>) where event is what is being listened for in worker process
+- CORS: requests across domain or across port
+- Postgres uses Pool to connect with keys passed into instance of Pool 
+- Make dev docker FOR EACH application
+- Use volumes to avoid needing to rebuild image every time a change is made
+- Docker compose file makes it easier to start image as container with right arguments. Make for project with multiple containers
+	- When identify service in docker, just list service name
+	- Make service for each image you want to make: so client/worker/server for this app
+	- postgres service and redis service, specify which image to use as a service
+		- Just need to identify which services the project is going to be using
+	- Define local server as a service, with build that identifies dockerfile and context (which directory to look at)
+		- Build image from another directory
+		- Volume pointing from app directory on VM, so whenever that is accessed will look at server directory
+			- This allows NOT rebuilding image when change source code because is reflected by volume from VM to source code files
+	- env variables: customize how server behaves when it starts as a container by pulling info from environment
+		- variableName=value (set variable in container at runtime)
+			- Build image first step, AND THEN use it to make instance of container (2 steps)
+		- environment value of server which is array of variables, holds process.env values
+		- Need to list host, port, and password for each service	
+- Nginx server
+	- Enforces routing because some requests only for react, others only for express
+ 	- Add service as nginx server that will determine where requests go
+	- Port can easily change, so easier to handle different server routing with url prefix
+	- Configuration only changes at nginx layer
+	- Routing
+		- default.cong added to nginx image for routing
+		- Upstream server: servers that nginx can optionally redirect traffic to, at port back services are listening to
+			- Names are those of services put together in docker-compose for each layer of app
+			- Service is like domain that can be reference to get to service
+		- Nginx listens on port in container, and then routes based on which upstream is requested
+		- Default.conf file for each upstream service, matching name of service in docker compose file
+			- Set up server object to listen on port and proxy requests to necessary ports and rewrite rules 
+			- Files control config so need to copy over
+	- Container for nginx with custom image to configure routing
+		- In dockerfile for nginx tell it which file to use, need to replace default command to command of parent image not used
+		- Copy conf file made on local machine into VM
+		- Add nginx as service to docker compose, and use restart policy to make sure it is running
+		- Need port mapping for this in docker compose because it is base router
+- Websocket
+	- Active running react application in server wants connection tor react server; notification for source code changes
+	- Proxy pass from location socket is looking for to client in default.conf
+- Env variables need to be added for each service that uses them
+- Services that call each other, like server calling postgres, need to 'depend on' that service in docker-compose file
+
+
+	
+
+		
+	 
