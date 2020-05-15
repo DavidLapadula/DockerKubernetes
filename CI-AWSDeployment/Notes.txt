@@ -31,3 +31,35 @@ Travis
 	- EXPOSE instruction in Dockerfile, EB will look for this instruction for a port to map directly
 - PR will allow travis to pull down changes, when go to merge will show that tests have passed
 - Docker is just tool in development process. Allow SETTING UP easier, and do not have to redo deployment pipeline for another project
+
+- Travis can build prod image, push to Dockerhub, EB pulls from DockerHub to deploy. Prevents EB from building images instead of just deploying
+	- Production docker file will not run any tests and only copies over files that are required
+- nginx used to handle own appliocation routing and to serve prod react files from specified port
+	- One container for routing, another one for serving up assets
+- npm run build will create folder called 'build' with production assets
+- In React app behind main nginx router, another nginx router listening on other port to serve react files
+	- Need to expose THAT port in default.conf for nginx and copy over build files when images being made
+- Travis deployment
+	- First build test images (development docker file) to run tests
+	- before_install specifies which dockerfile to use and relative build context
+	- after_success for building production level images (uses default dockerfile and build context) to pushed to docker hub
+- Tell EB what to do with multiple containers. Need file to do so, and specify which image to use. EB will pull image and tell it to run
+	- Dockerrun json file. Elastic Container Service (ECS) uses task definitions to run container
+	- Dockerrun uses rules of task definitions for ECS
+	- Image defined in docker run file, and docker compose sets hostname when setting service name for image
+		- Hostname will is what routing will look for when traffic is incoming
+	- Port mapping to set host from one running on container to the one running on container
+- Make links between containers, need to made distinct between running containers
+- In production, use other AWS services for data providers instead of own containers
+	- Elastic Cache instead of redis, AWS RDS instead of Postgre instance: 
+		- will make pro instance of redis, auto scale, built in maintenance, better security, auto rollbacks
+- Need to form connection between EB and external services
+- Virtual Private Cloud	created for each region, little network for only your account to manage services	 
+- Security group (Firewall Rule): which services can access your VPC. Make all instances belong to one group, then can access other services
+- Making Custom Security Group
+	- Allows services to talk to eachother, rules allow traffic by assigning service to that security group
+	- Then apply security group to instances as needed, modify service to belong to security group that you created
+	- Host for services EB reaches to is the endpoint of the service made for it
+	- All containers on EB instance has access to ENV variables set in AWS
+	- Travis will build production images THEN to docker hub, THEN Travis pushes project to EB, EB pulls images from docker hub
+- Memory option needed for containers, need to tell it in Dockerrun json
