@@ -1,0 +1,40 @@
+- K8s system for running different containers over multiple machines, use when need to run different containers
+- K8s is system to deploy containerized apps
+- EB will use multiple sets of all containers to scale
+- Cluster: master and nodes (VM or machine that runs containers)
+	- Master controls what each of node is doing, instructions sent out to master
+- Kubectl to tell VM what containers are to be running
+- Minikube to run containers on the machine	
+- Each service in docker-compose makes a container
+- K8s cannot build images, one config file per object, need to manually set networking
+- Make object types inside k8s cluster, each has a specific purpose (run container, networking) etc.
+	- 'kind' means type of object want to make. Pod will rn container, service is for networking
+	- apiVersion opens access to predefined set of object types
+	- First need to determine which object to make, and then decide which apiVersion grants access to this
+- VM will run Node for Kubernetes, Node runs various objects, like a Pod which runs containers
+	- Pod is smallest thing that can be deployed
+	- Pod for containers that need to run together; they discrete and coupled rel'p
+	- Use 'spec' property of config file to name containers for Pod and image to build containers from
+- Service object type for networking k8s cluster with subtypes for specific uses
+	- Held in 'spec' of config E.x nodeport for exposing container for access during development
+- Label selector system: use selector property in service config file to determine which object communicate with eachother, and same k/v label in other object
+	- Service has selector that looks for label in other object to expose port for that object with the missing label
+		- port is for other pods accessing your pod, target port is how service accesses your pod, and nodeport is port exposed by your pod for outside access
+- kubectl 'get' command will print out object types, just call get for the type of object that you want
+- k8s will create node (minikube on local) where a proxy allows you to interact with different objects
+	- Node is a VM created to run container, and VM has an IP that needs to be addressed to see
+- Deployment workflow: update desired state of master
+	- Developer works with master, which will then reach to node and update it
+	- Master is watching nodes, and will work to maintain state/responsibilities
+	- Node is physical or VM that runs objects in cluster
+		- Node is running a copy of docker
+	- Deployment file passes instructions to kube-apiserver (which makes sure nodes doing the right thing)
+		- kube-apiserver records the responsibilities it needs to perform 
+	- kube-apiserver issues instructions to node, which then uses version of docker to reach to hub get image and make container of it
+	- Master watches nodes, and gets notification when something happens
+- K8s gets images from somewherem, does not build it. MASTER decides where to run build each container
+- Imperative: issue commands with such steps
+	- kubectl has declarative approach commands, and these are the desired set to interact through master
+- Declarative: program should look like this, directive to do it
+	- Declarative deployment superior because do not need to find current state of program and issue all commands
+	- Edit config file to change state and sending it off to master
