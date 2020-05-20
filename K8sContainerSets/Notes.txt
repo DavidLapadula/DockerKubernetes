@@ -1,0 +1,23 @@
+- Updating pods to run new image, imperative would be to find and update the pod with command. Need migration strategy
+	- Declarative way is to just update config file and
+- All objects have a name, type, and image
+	- Master will look at name and type, reach into cluster and update that object
+- kubectl describe <obj type> <obj name> to get information about the object on the vm
+	- Event that occurs over the lifecycle of the pod
+- Can only update certain properties on each of the objects
+- Deployment 'object' to maintain set of identical pods; ensures correct config and amount of pods
+	- Has a Pod template which is template for each pod that it manages (containers, name, images) etc.
+	- Template: lists the configuration for each pod (name, image, container)
+	- Deployment reaches to master which will create the pod (using label listed in template)
+	- Replicas will determine how many pods to run in a deployment 
+- Service object
+	- Every pod gets a random IP internal to VM, and this internal IP can change
+	- Watches for every pod that matches its selector and automatically route traffic to it. Need service to watch when IP changes
+- Change image when code has been updated
+	- Could tag image with version, so when change version in config it sees change and change image for container in pods
+		- Need to assign version number and need to inject number into file; also multiple commits for new image and update to config file
+		- Use kubectl set command to update one of the objects in the cluster
+	- Imperative demand to update version image uses 
+- Each VM (node) is running a version of docker (client, server, image cache)
+	- Can configure CLI to communicate with version of docker inside VM
+	- Useful for getting logs, cleaning up containers, going into container and seeing fs
