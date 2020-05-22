@@ -1,0 +1,13 @@
+- NodePort vs ClusterIP service
+	- Selector and Label is how deployment knows which pod to manage
+	- Service is for NETWORKING. A Nodeport will set up a cluster of pods
+	- ClusterIP will expose pods to other objects in the k8s cluster, more restrictive because outisde traffic not allowed
+		- Allows anything else in cluster to get access to this IP
+ 		- Ingress service will alow outisde world to access cluster IP
+		- Need selector to determine which set of pods it is to give access TO
+			- Port is how OTHER pods gain access to pod cluster-ip governing access to
+			- targetPort ON other pod giving acces to (port on the pods being governed)
+- Can apply with kubectl with applying a whole file
+- Selector is how deployment knows which pods to manage
+- Can combine config into multiple files, can put multiple object in a file
+	- Difference in config file will try to make new object
