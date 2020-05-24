@@ -1,0 +1,43 @@
+- NodePort vs ClusterIP service
+	- Selector and Label is how deployment knows which pod to manage
+	- Service is for NETWORKING. A Nodeport will set up a cluster of pods
+	- ClusterIP will expose pods to other objects in the k8s cluster, more restrictive because outisde traffic not allowed
+		- Allows anything else in cluster to get access to this IP
+ 		- Ingress service will alow outisde world to access cluster IP
+		- Need selector to determine which set of pods it is to give access TO
+			- Port is how OTHER pods gain access to pod cluster-ip governing access to
+			- targetPort ON other pod giving acces to (port on the pods being governed)
+- Can apply with kubectl with applying a whole file
+- Selector is how deployment knows which pods to manage
+- Can combine config into multiple files, can put multiple object in a file
+	- Difference in config file will try to make new object
+- K8s wants all images to be built, one config file per object, manual networking 
+- Persistent Volume Claim
+	- Volume to share fs of host machine to that in container
+	- If pod crashes inside deployment, everything deleted includnig data (bad for database)
+	- Need volume for data so that crashing wont delete it, need volume to exist on host machine. All containers need to access same data on fs\
+- Docker container terminology for volume, is storing data outside of fs
+- For k8s 'volume' is an object for container storing data at POD level 
+	- K8s volume is data storage pocket (still an object) and is specific to that pod, available to any container in pod
+		- Will survive container restart, but becauise linked to Pod, if Pod dies then volume will also die
+	- k8s persistent volume is longterm storage not tied to pod or container - it is outside or separate from the pod
+	- PVC is advertisement for what pod has access to for storage in cluster. 
+		- K8s will look at persistent volumes that are made ahead of time (statically provisioned)
+		- Or could ask for persistent volume and make it on the fly for you (dynamically provisioned)
+- Volume claim is only for Pod config, config given to k8s which will then try to find statically provisioned volume, or make dynamically provisioned one
+	- k8s will have to find storage that supports access modes you spec out
+	- Spec is how you configure actaul pvc in config file
+	- AccessModes to determine how many nodes can access, and whether they can read/write
+- PVC will exist as a slice of non-volatile memory on local machine in dev, default is HD but can change default. Need to configure which option touse when on cloud
+	- Provisioners are called 'Storage Class' - default for cloud provider is average 
+- Update template section of deployment object config, tell pod to request (from k8s) storage outlined in PVC config
+	- Volumes spec will tell pod to request certain PVC
+	- The use 'volumeMounts' to container config of deployment object to look for storage that had been requested
+	- Mount path will be where the data is being stored, but this will be located in the volume requested
+- Host env variables is how container will reach out to another server like (db)
+	- Env variable must be a string
+	- Value is just the name of the object (ClusterIP only for pod to pod comms), and then ClusterIP will connect to that machine
+- Secret - type of object in k8s for securely storing data in cluster 
+	- Can have many k/v pairs, and need to tell env variable which to use during config
+	- Manually (imperative) create so do not need config, which would expose information anyway
+	- Need to override in making image so default is not used. Env variable stays the same but then use valueFrom to point it to secret object
