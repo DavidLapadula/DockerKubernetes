@@ -1,9 +1,12 @@
+- Browser will default to port 80
+- 'Controller' is thing that works to maintain a certain state of a program
+- Config file describes desired state of the program and determine a migration path to there
 - NodePort vs ClusterIP service
 	- Selector and Label is how deployment knows which pod to manage
 	- Service is for NETWORKING. A Nodeport will set up a cluster of pods
 	- ClusterIP will expose pods to other objects in the k8s cluster, more restrictive because outisde traffic not allowed
 		- Allows anything else in cluster to get access to this IP
- 		- Ingress service will alow outisde world to access cluster IP
+ 		- Ingress service will alow outside world to access cluster IP
 		- Need selector to determine which set of pods it is to give access TO
 			- Port is how OTHER pods gain access to pod cluster-ip governing access to
 			- targetPort ON other pod giving acces to (port on the pods being governed)
@@ -41,3 +44,16 @@
 	- Can have many k/v pairs, and need to tell env variable which to use during config
 	- Manually (imperative) create so do not need config, which would expose information anyway
 	- Need to override in making image so default is not used. Env variable stays the same but then use valueFrom to point it to secret object
+- Ingress load balancer
+	- Load balancer: Access to one set of pods, and only one
+	- Ingress: expose services to the public, allows uers to access pods running containers
+	- Config file will describe routing rules to feed traffic into the cluster
+		- Ingress controller will make infrastructure to route thet traffic properly
+			- Controller is deployment that communicates with config to maintain desired state
+				- Controller is deployment that runs nginx pod that routes traffic for you
+			- Controller could also itself route the traffic as its own deployment object
+		- Runs pod to ensure incoming traffic routes the traffic correctly (small nginx pod)
+	- 'Default Backend' deployment object when things are created to ensure the health of the system
+	- Ingress nginx will USE ClusterIP for routing, but not send traffic for load balancing to it. Goes directly to pod for sticky sessions (multiple requests from same user then goes to same server)
+	- Rewrite target to strip sub-domain from URL so path to server is not coupled to path coming in (/api becomes /)
+	- 'Rules' of spec in ingress config file send the traffic to another ClusterIP service, based on path

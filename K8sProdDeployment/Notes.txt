@@ -1,0 +1,13 @@
+- Need to first create a kubernetes cluster, and can make any number of nodes with specific CPU and memory size of VM
+- One travis (config file) for each container, so when its pushed CI system updates cluster
+    - Before install sign into gcloud sdk, install kubectl, and give user credentials to login properly
+    - Need service account to allow the permissions on the service account
+- Alpine version of image not the best if the dependencies are required to build the container
+- Use volume for encrypted file so container knows about sensitive information like authentication
+- Travis CI on local VM to encrypt the file and associated to repo, which is what Travis will use to deploy
+    - And then encrypted command in travis.yaml file for before_install to ensure credentials there are getting used
+    - Will make encrypted version which is where credentias live, volumed folder means if made in VM will reflect in local machine
+    - After Travis unencrypts it, it will place the file inside of the directory so it can be referenced
+- Need to set project, compute zone, and cluster
+    - Cluster needed so Google cloud can reach out and work specifically with one cluster
+    
