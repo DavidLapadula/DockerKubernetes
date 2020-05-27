@@ -10,4 +10,14 @@
     - After Travis unencrypts it, it will place the file inside of the directory so it can be referenced
 - Need to set project, compute zone, and cluster
     - Cluster needed so Google cloud can reach out and work specifically with one cluster
+- Script to build image, tag image, and push to docker (do this all in custom bash file)
+- kubectl to set image on an object to ensure that it updates
+    - Implicit latest tag will prevent deployment from using latest image because it will think there has yet to be a change
+    - Every commit generates unique SHA, so use this to tag the image and will always be new
+    - This also helps for debugging so can revert to that commit and codebase will reflect current state of code
+        - Still use latest tag so it can still be referenced by latest if it has to be rebuilt/recloned 
+    - env stored in yaml file for git commit unique id
+    - Need to push for each image tag, :latest default and SHA
+- Helm for 3rd party service inside of cluster (like nginx deployment inside)
+- 
     
