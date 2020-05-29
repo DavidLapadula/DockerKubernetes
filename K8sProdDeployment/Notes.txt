@@ -1,0 +1,51 @@
+- Need to first create a kubernetes cluster, and can make any number of nodes with specific CPU and memory size of VM
+- One travis (config file) for each container, so when its pushed CI system updates cluster
+    - Before install sign into gcloud sdk, install kubectl, and give user credentials to login properly
+    - Need service account to allow the permissions on the service account
+- Alpine version of image not the best if the dependencies are required to build the container
+- Use volume for encrypted file so container knows about sensitive information like authentication
+- Travis CI on local VM to encrypt the file and associated to repo, which is what Travis will use to deploy
+    - And then encrypted command in travis.yaml file for before_install to ensure credentials there are getting used
+    - Will make encrypted version which is where credentias live, volumed folder means if made in VM will reflect in local machine
+    - After Travis unencrypts it, it will place the file inside of the directory so it can be referenced
+- Need to set project, compute zone, and cluster
+    - Cluster needed so Google cloud can reach out and work specifically with one cluster
+- Script to build image, tag image, and push to docker (do this all in custom bash file)
+- kubectl to set image on an object to ensure that it updates
+    - Implicit latest tag will prevent deployment from using latest image because it will think there has yet to be a change
+    - Every commit generates unique SHA, so use this to tag the image and will always be new
+    - This also helps for debugging so can revert to that commit and codebase will reflect current state of code
+        - Still use latest tag so it can still be referenced by latest if it has to be rebuilt/recloned 
+    - env stored in yaml file for git commit unique id
+    - Need to push for each image tag, :latest default and SHA
+- Helm for 3rd party service inside of cluster (like nginx deployment inside)
+    - Helm issues command to Tiller, which changes the config on the cluster
+- RBAC
+    - Role based access control: limits who can make changes to the cluster
+    - Tiller needs permission to make the correct changes
+    - User account: identifies a person, Service Account: pod administering a cluster
+        - Accounts are only to identify you, no ability to change cluster
+    - ClusterRoleBinding: make change across entire cluster, RoleBinding: only within a single namespace (different namespaces can have different resources)
+        - Role bindings assigned to certain account
+        - E.X kube-system namespace which is administrative objects in cluster that allow cluster to work correctly
+            - Auth can be made at this level and associated with Tiller account so it can make changes to cluster
+- Ingress is deployment that controls pod that runs nginx for incoming traffic
+-  Workflow for updates in production (Including HTTPS support)
+    - Certificate required to say that you own domain
+    - Objects inside of cluster will verify certificate with issuer/certificate
+    - Certificate manager (help) takes instruction from Issuer Object about where to get certificate
+        - Will set up infrastructure for http challenge, and get secret
+        - Secret passed to certificate object which then authenticates with cert manager
+            - Need to make both of the objects inside of the cluster
+        - Secret will allow ingress to serve up https
+- Issuer object
+    - Config required to make issuer object for certificate (telling manager where to get certificate)
+- Cetificate is object for details about the certificate being obtained
+- Need to tell nginx config it is serving up https traffic, and ssl redirect to guarantee https used
+- Skaffold: used with k8s for local development
+    - Mode 1: Watch for changes and rebuild development images
+    - Mode 2: Inject files directly into the Pod when files change
+    - Will try constantly push changes to docker repo, but can make push false locally
+    - Artifacts are containers that skaffold manages
+        - Set up so whenever certain file type changes, that file is injected into the Pod (Mode 2)
+    - Manifest to apply config to cluster
