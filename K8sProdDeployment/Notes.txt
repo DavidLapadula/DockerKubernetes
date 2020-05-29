@@ -19,5 +19,33 @@
     - env stored in yaml file for git commit unique id
     - Need to push for each image tag, :latest default and SHA
 - Helm for 3rd party service inside of cluster (like nginx deployment inside)
-- 
-    
+    - Helm issues command to Tiller, which changes the config on the cluster
+- RBAC
+    - Role based access control: limits who can make changes to the cluster
+    - Tiller needs permission to make the correct changes
+    - User account: identifies a person, Service Account: pod administering a cluster
+        - Accounts are only to identify you, no ability to change cluster
+    - ClusterRoleBinding: make change across entire cluster, RoleBinding: only within a single namespace (different namespaces can have different resources)
+        - Role bindings assigned to certain account
+        - E.X kube-system namespace which is administrative objects in cluster that allow cluster to work correctly
+            - Auth can be made at this level and associated with Tiller account so it can make changes to cluster
+- Ingress is deployment that controls pod that runs nginx for incoming traffic
+-  Workflow for updates in production (Including HTTPS support)
+    - Certificate required to say that you own domain
+    - Objects inside of cluster will verify certificate with issuer/certificate
+    - Certificate manager (help) takes instruction from Issuer Object about where to get certificate
+        - Will set up infrastructure for http challenge, and get secret
+        - Secret passed to certificate object which then authenticates with cert manager
+            - Need to make both of the objects inside of the cluster
+        - Secret will allow ingress to serve up https
+- Issuer object
+    - Config required to make issuer object for certificate (telling manager where to get certificate)
+- Cetificate is object for details about the certificate being obtained
+- Need to tell nginx config it is serving up https traffic, and ssl redirect to guarantee https used
+- Skaffold: used with k8s for local development
+    - Mode 1: Watch for changes and rebuild development images
+    - Mode 2: Inject files directly into the Pod when files change
+    - Will try constantly push changes to docker repo, but can make push false locally
+    - Artifacts are containers that skaffold manages
+        - Set up so whenever certain file type changes, that file is injected into the Pod (Mode 2)
+    - Manifest to apply config to cluster
